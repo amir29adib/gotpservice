@@ -1,4 +1,45 @@
 basePath: /
+definitions:
+  dto.OTPRequestDTO:
+    properties:
+      phone:
+        type: string
+    required:
+    - phone
+    type: object
+  dto.OTPVerifyDTO:
+    properties:
+      code:
+        type: string
+      phone:
+        type: string
+    required:
+    - code
+    - phone
+    type: object
+  dto.TokenResponseDTO:
+    properties:
+      token:
+        type: string
+    type: object
+  dto.UserDTO:
+    properties:
+      id:
+        type: integer
+      phone:
+        type: string
+      registration_date:
+        type: string
+    type: object
+  dto.UserListResponseDTO:
+    properties:
+      total:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/dto.UserDTO'
+        type: array
+    type: object
 info:
   contact:
     email: dev@example.com
@@ -7,9 +48,18 @@ info:
   title: OTP Service API
   version: 0.1.0
 paths:
-  /health:
-    get:
-      description: Returns service health
+  /auth/request-otp:
+    post:
+      consumes:
+      - application/json
+      description: Generate a one-time password (OTP) and print to console
+      parameters:
+      - description: Phone number payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OTPRequestDTO'
       produces:
       - application/json
       responses:
@@ -19,23 +69,110 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Health check
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "429":
+          description: Too Many Requests
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Request OTP code
       tags:
-      - meta
-  /version:
-    get:
-      description: Returns app version
+      - Auth
+  /auth/verify-otp:
+    post:
+      consumes:
+      - application/json
+      description: Validate OTP, register new user if not exists, and return JWT
+      parameters:
+      - description: Phone and OTP code
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OTPVerifyDTO'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
+            $ref: '#/definitions/dto.TokenResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
             type: object
-      summary: Version
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Verify OTP and login/register
       tags:
-      - meta
+      - Auth
+  /users:
+    get:
+      description: Get a list of users with pagination and optional search by phone
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: limit
+        type: integer
+      - description: Search by phone
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserListResponseDTO'
+      security:
+      - BearerAuth: []
+      summary: List all users
+      tags:
+      - Users
+  /users/{phone}:
+    get:
+      description: Retrieve a user by their phone number
+      parameters:
+      - description: Phone Number
+        in: path
+        name: phone
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserDTO'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user by phone number
+      tags:
+      - Users
 schemes:
 - http
 securityDefinitions:
