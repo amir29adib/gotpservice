@@ -1,0 +1,46 @@
+basePath: /
+info:
+  contact:
+    email: dev@example.com
+    name: Backend Team
+  description: Gin-based skeleton for OTP auth service.
+  title: OTP Service API
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      description: Returns service health
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - meta
+  /version:
+    get:
+      description: Returns app version
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Version
+      tags:
+      - meta
+schemes:
+- http
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
