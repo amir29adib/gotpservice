@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: otpuser
+      POSTGRES_PASSWORD: otppass
+      POSTGRES_DB: otpdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: otpuser
+      DB_PASSWORD: otppass
+      DB_NAME: otpdb
+
+volumes:
+  postgres_data:
