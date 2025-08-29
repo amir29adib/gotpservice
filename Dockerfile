@@ -1,4 +1,4 @@
-FROM golang:1.22 AS builder
+FROM golang:1.23 AS builder
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ COPY . .
 
 RUN go build -o main ./cmd/server
 
-FROM alpine:3.20
+FROM debian:bookworm-slim
 
 WORKDIR /app
 
@@ -22,4 +22,4 @@ COPY --from=builder /app/main .
 
 EXPOSE 8080
 
-ENTRYPOINT ["/app/main"]
+CMD ["./main"]
