@@ -29,7 +29,7 @@ func NewUserHandler(s service.UserService) *UserHandler {
 // @Router /users/{phone} [get]
 func (h *UserHandler) GetUserByPhone(c *gin.Context) {
     phoneParam := c.Param("phone")
-    phoneFromToken, exists := c.Get("user_phone")
+    phoneFromToken, exists := c.Get("phone")
     if !exists || phoneParam != phoneFromToken {
         c.JSON(http.StatusForbidden, gin.H{"error": "You can only access your own profile"})
         return
