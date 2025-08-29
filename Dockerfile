@@ -4,13 +4,17 @@ WORKDIR /app
 
 COPY go.mod ./
 COPY go.sum ./
+
+ENV GOPROXY=https://goproxy.cn,direct
+ENV GOSUMDB=off
+
 RUN go mod download
 
 COPY . .
 
-RUN go build -o main ./cmd
+RUN go build -o main ./cmd/server
 
-FROM gcr.io/distroless/base-debian10
+FROM alpine:3.20
 
 WORKDIR /app
 
